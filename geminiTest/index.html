@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomoku MVP</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            grid-template-rows: repeat(19, 30px);
+            background-color: #d2b48c; /* Wood color */
+            border: 2px solid black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        /* Remove right border for the last column */
+        .cell:nth-child(19n) {
+            border-right: none;
+        }
+
+        /* Remove bottom border for the last row */
+        .cell:nth-last-child(-n + 19) {
+            border-bottom: none;
+        }
+
+        .stone {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: -13px;
+            left: -13px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .black {
+            background-color: black;
+        }
+
+        .white {
+            background-color: white;
+        }
+
+        .hover-square {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            top: -14px;
+            left: -14px;
+            border: 1px solid red;
+            box-sizing: border-box;
+            pointer-events: none; /* Allow clicks to pass through to the cell */
+        }
+    </style>
+</head>
+<body>
+    <h1>Gomoku MVP</h1>
+    <div id="board"></div>
+
+    <script>
+        const boardElement = document.getElementById("board");
+
+        const BOARD_SIZE = 19;
+        const EMPTY = 0;
+        const PLAYER_BLACK = 1;
+        const PLAYER_WHITE = 2;
+
+        let board = Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(EMPTY));
+        let currentPlayer = PLAYER_BLACK; // Start with Black
+
+        function renderBoard() {
+            console.log("renderBoard: called");
+            boardElement.innerHTML = ""; // Clear existing board
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.addEventListener("click", handleCellClick);
+                    cell.addEventListener("mouseover", handleCellHover);
+                    cell.addEventListener("mouseout", handleCellOut);
+
+                    if (board[r][c] === PLAYER_BLACK) {
+                        console.log(`renderBoard: placing black stone at (${r}, ${c})`);
+                        const stone = document.createElement("div");
+                        stone.classList.add("stone", "black");
+                        cell.appendChild(stone);
+                    } else if (board[r][c] === PLAYER_WHITE) {
+                        console.log(`renderBoard: placing white stone at (${r}, ${c})`);
+                        const stone = document.createElement("div");
+                        stone.classList.add("stone", "white");
+                        cell.appendChild(stone);
+                    }
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(event) {
+            console.log("handleCellClick: called");
+            const cell = event.currentTarget; // Use currentTarget
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            console.log(`handleCellClick: clicked on (${row}, ${col})`);
+
+            if (board[row][col] === EMPTY) {
+                board[row][col] = currentPlayer;
+                renderBoard();
+                currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK; // Switch player
+                console.log(`handleCellClick: switched to player ${currentPlayer}'s turn`);
+            } else {
+                console.log("handleCellClick: cell already occupied");
+            }
+        }
+
+        function handleCellHover(event) {
+            const cell = event.currentTarget; // Use currentTarget
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+
+            if (board[row][col] === EMPTY) {
+                const hoverSquare = document.createElement("div");
+                hoverSquare.classList.add("hover-square");
+                cell.appendChild(hoverSquare);
+            }
+        }
+
+        function handleCellOut(event) {
+            const cell = event.currentTarget; // Use currentTarget
+            const hoverSquare = cell.querySelector(".hover-square");
+            if (hoverSquare) {
+                cell.removeChild(hoverSquare);
+            }
+        }
+
+        // Initial setup
+        document.addEventListener("DOMContentLoaded", () => {
+            renderBoard();
+        });
+    </script>
+</body>
+</html>
