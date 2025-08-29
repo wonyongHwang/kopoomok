@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gomoku MVP</title>
+    <title>Gomoku</title>
     <style>
         body {
             font-family: sans-serif;
@@ -19,6 +18,40 @@
         h1 {
             color: #333;
             margin-bottom: 20px;
+        }
+
+        #game-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #game-controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        #game-controls button:hover {
+            background-color: #45a049;
+        }
+
+        #player-selection {
+            display: none; /* Hidden by default, shown by JS */
+            gap: 10px;
+        }
+
+        #player-selection button {
+            background-color: #008CBA;
+        }
+
+        #player-selection button:hover {
+            background-color: #007B9A;
         }
 
         #board {
@@ -77,14 +110,34 @@
             box-sizing: border-box;
             pointer-events: none; /* Allow clicks to pass through to the cell */
         }
+
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-    <h1>Gomoku MVP</h1>
+    <h1>Gomoku</h1>
+    <div id="game-controls">
+        <button id="start-game">Start Game</button>
+        <div id="player-selection">
+            <button id="select-first">Play First (Black)</button>
+            <button id="select-second">Play Second (White)</button>
+        </div>
+    </div>
     <div id="board"></div>
+    <div id="score"></div>
 
     <script>
         const boardElement = document.getElementById("board");
+        const startGameButton = document.getElementById("start-game");
+        const playerSelectionDiv = document.getElementById("player-selection");
+        const selectFirstButton = document.getElementById("select-first");
+        const selectSecondButton = document.getElementById("select-second");
+        const scoreDiv = document.getElementById("score");
 
         const BOARD_SIZE = 19;
         const EMPTY = 0;
@@ -92,7 +145,88 @@
         const PLAYER_WHITE = 2;
 
         let board = Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(EMPTY));
-        let currentPlayer = PLAYER_BLACK; // Start with Black
+        let currentPlayer = PLAYER_BLACK; // Game always starts with Black
+        let playerColor = null; // User's chosen color (PLAYER_BLACK or PLAYER_WHITE)
+        let gameStarted = false;
+        let gameEnded = false;
+
+        let playerWins = 0;
+        let aiWins = 0;
+
+        // --- Game Logic ---
+
+        function resetGame() {
+            board = Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(EMPTY));
+            currentPlayer = PLAYER_BLACK;
+            gameEnded = false;
+            renderBoard();
+            updateScoreDisplay();
+        }
+
+        function isValidMove(row, col) {
+            if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+                return false; // Out of bounds
+            }
+            if (board[row][col] !== EMPTY) {
+                return false; // Cell already occupied
+            }
+            // 3x3 rule will be re-implemented here later
+            return true;
+        }
+
+        function makeMove(row, col, player) {
+            board[row][col] = player;
+        }
+
+        function checkWin(row, col, player) {
+            // Check all 8 directions for 5 in a row
+            const directions = [
+                [0, 1], [1, 0], [1, 1], [1, -1] // Horizontal, Vertical, Diagonals
+            ];
+
+            for (const [dr, dc] of directions) {
+                let count = 1;
+                // Check in one direction
+                for (let i = 1; i < 5; i++) {
+                    const r = row + i * dr;
+                    const c = col + i * dc;
+                    if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                // Check in the opposite direction
+                for (let i = 1; i < 5; i++) {
+                    const r = row - i * dr;
+                    const c = col - i * dc;
+                    if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                if (count >= 5) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // --- AI Logic (Placeholder for now) ---
+        function getAIMove() {
+            // Simple AI: find first empty spot
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (board[r][c] === EMPTY) {
+                        return { r, c };
+                    }
+                }
+            }
+            return null;
+        }
+
+        // --- UI Rendering ---
 
         function renderBoard() {
             console.log("renderBoard: called");
@@ -123,20 +257,75 @@
             }
         }
 
-        function handleCellClick(event) {
+        function updateScoreDisplay() {
+            console.log("updateScoreDisplay: called");
+            scoreDiv.textContent = `Player Wins: ${playerWins} | AI Wins: ${aiWins}`;
+        }
+
+
+        // --- Event Handlers ---
+
+        async function handleCellClick(event) {
             console.log("handleCellClick: called");
+            if (!gameStarted || gameEnded || playerColor === null || currentPlayer !== playerColor) {
+                console.log("handleCellClick: blocked (game not started/ended, player not selected, or not player's turn)");
+                return; // Game not started, ended, player not selected, or not player's turn
+            }
+
             const cell = event.currentTarget; // Use currentTarget
             const row = parseInt(cell.dataset.row);
             const col = parseInt(cell.dataset.col);
             console.log(`handleCellClick: clicked on (${row}, ${col})`);
 
-            if (board[row][col] === EMPTY) {
-                board[row][col] = currentPlayer;
+            if (isValidMove(row, col)) {
+                console.log(`handleCellClick: valid move at (${row}, ${col})`);
+                makeMove(row, col, currentPlayer);
                 renderBoard();
-                currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK; // Switch player
+
+                if (checkWin(row, col, currentPlayer)) {
+                    console.log("handleCellClick: win detected for current player");
+                    alert(playerColor === PLAYER_BLACK ? "You (Black) win!" : "You (White) win!");
+                    playerWins++;
+                    gameEnded = true;
+                    updateScoreDisplay();
+                    startGameButton.style.display = "block"; // Show start button again
+                    return;
+                }
+
+                // Switch to AI's turn
+                currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
                 console.log(`handleCellClick: switched to player ${currentPlayer}'s turn`);
-            } else {
-                console.log("handleCellClick: cell already occupied");
+
+                // AI's turn
+                if (!gameEnded) {
+                    console.log("handleCellClick: AI's turn");
+                    // Small delay for AI to appear more natural
+                    setTimeout(() => {
+                        const aiMove = getAIMove();
+                        if (aiMove) {
+                            console.log(`handleCellClick: AI move at (${aiMove.r}, ${aiMove.c})`);
+                            makeMove(aiMove.r, aiMove.c, currentPlayer);
+                            renderBoard();
+                            if (checkWin(aiMove.r, aiMove.c, currentPlayer)) {
+                                console.log("handleCellClick: AI wins!");
+                                alert("AI wins!");
+                                aiWins++;
+                                gameEnded = true;
+                                updateScoreDisplay();
+                                startGameButton.style.display = "block"; // Show start button again
+                            }
+                            // Switch back to player's turn
+                            currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
+                            console.log(`handleCellClick: switched back to player ${currentPlayer}'s turn`);
+                        } else {
+                            // No more moves, it's a draw
+                            console.log("handleCellClick: It's a draw!");
+                            alert("It's a draw!");
+                            gameEnded = true;
+                            startGameButton.style.display = "block";
+                        }
+                    }, 500); // 500ms delay
+                }
             }
         }
 
@@ -160,9 +349,42 @@
             }
         }
 
-        // Initial setup
+        // --- Initial Setup ---
         document.addEventListener("DOMContentLoaded", () => {
-            renderBoard();
+            playerSelectionDiv.style.display = "none"; // Hide player selection on load
+            startGameButton.addEventListener("click", () => {
+                console.log("Start Game button clicked");
+                gameStarted = true;
+                gameEnded = false;
+                resetGame(); // Reset board and stats
+                startGameButton.style.display = "none";
+                playerSelectionDiv.style.display = "flex"; // Show player selection
+            });
+
+            selectFirstButton.addEventListener("click", () => {
+                console.log("Play First button clicked");
+                playerColor = PLAYER_BLACK;
+                playerSelectionDiv.style.display = "none";
+                // Player (Black) makes the first move, no AI action needed here
+            });
+
+            selectSecondButton.addEventListener("click", () => {
+                console.log("Play Second button clicked");
+                playerColor = PLAYER_WHITE;
+                playerSelectionDiv.style.display = "none";
+                // AI (Black) makes the first move
+                setTimeout(() => {
+                    const aiMove = getAIMove();
+                    if (aiMove) {
+                        makeMove(aiMove.r, aiMove.c, PLAYER_BLACK);
+                        renderBoard();
+                        currentPlayer = PLAYER_WHITE; // Switch to player's turn
+                    }
+                }, 500); // Small delay for AI's first move
+            });
+
+            renderBoard(); // Initial render of empty board
+            updateScoreDisplay();
         });
     </script>
 </body>
