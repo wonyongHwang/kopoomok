@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,6 +116,19 @@
             background-color: white;
         }
 
+        .last-move::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid white;
+        }
+
         .hover-square {
             position: absolute;
             width: 28px;
@@ -178,6 +192,7 @@
     <div id="ai-evaluation-display"></div>
 
     <script src="ai.js"></script>
+    <script src="threebythree.js"></script>
     <script>
         // --- Global Variables ---
         const boardElement = document.getElementById("board");
@@ -198,23 +213,33 @@
         let searchDepth = 2; // Default to Medium
         let playerWins = 0;
         let aiWins = 0;
+        let lastMove = null; // To store the last move {r, c}
 
         // --- Game Logic ---
         function resetGame() {
             board = Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(EMPTY));
             currentPlayer = PLAYER_BLACK;
             gameEnded = false;
+            lastMove = null;
             renderBoard();
             updateScoreDisplay();
             aiProgressElement.style.display = 'none';
+            aiEvaluationDisplay.innerHTML = ""; // Clear AI evaluation grid
         }
 
         function isValidMove(row, col) {
-            return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE && board[row][col] === EMPTY;
+            if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+                return false;
+            }
+            if (board[row][col] !== EMPTY) {
+                return false;
+            }
+            return true;
         }
 
         function makeMove(row, col, player) {
             board[row][col] = player;
+            lastMove = { r: row, c: col }; // Update the last move
         }
 
         // --- UI Rendering ---
@@ -233,6 +258,10 @@
                     if (board[r][c] !== EMPTY) {
                         const stone = document.createElement("div");
                         stone.classList.add("stone", board[r][c] === PLAYER_BLACK ? "black" : "white");
+                        // Highlight the last move
+                        if (lastMove && r === lastMove.r && c === lastMove.c) {
+                            stone.classList.add("last-move");
+                        }
                         cell.appendChild(stone);
                     }
                     boardElement.appendChild(cell);
@@ -254,25 +283,31 @@
             const row = parseInt(cell.dataset.row);
             const col = parseInt(cell.dataset.col);
 
-            if (isValidMove(row, col)) {
-                makeMove(row, col, currentPlayer);
-                renderBoard();
+            if (!isValidMove(row, col)) {
+                return;
+            }
 
-                if (checkWin(row, col, currentPlayer, board)) {
-                    alert(playerColor === PLAYER_BLACK ? "You (Black) win!" : "You (White) win!");
-                    playerWins++;
-                    gameEnded = true;
-                    updateScoreDisplay();
-                    startGameButton.style.display = "block";
-                    return;
-                }
+            if (isThreeByThree(board, row, col, currentPlayer)) {
+                alert("3x3 위치에는 돌을 둘 수 없습니다.");
+                return;
+            }
 
-                currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
-                
-                if (!gameEnded) {
-                    // Use a non-blocking timeout to allow UI to update before AI starts thinking
-                    setTimeout(triggerAIMove, 50);
-                }
+            makeMove(row, col, currentPlayer);
+            renderBoard();
+
+            if (checkWin(row, col, currentPlayer, board)) {
+                alert(playerColor === PLAYER_BLACK ? "You (Black) win!" : "You (White) win!");
+                playerWins++;
+                gameEnded = true;
+                updateScoreDisplay();
+                startGameButton.style.display = "block";
+                return;
+            }
+
+            currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
+            
+            if (!gameEnded) {
+                setTimeout(triggerAIMove, 50);
             }
         }
 
