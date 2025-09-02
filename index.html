@@ -82,7 +82,42 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        #board-wrapper {
+            display: grid;
+            grid-template-columns: 30px 1fr; /* Column for row labels and board */
+            grid-template-rows: 30px 1fr;    /* Row for col labels and board */
+            gap: 5px;
+        }
+
+        #col-labels {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            font-weight: bold;
+            position: relative; /* For fine-tuning alignment */
+            left: -15px;
+        }
+
+        #row-labels {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+            display: grid;
+            grid-template-rows: repeat(19, 30px);
+            font-weight: bold;
+            position: relative; /* For fine-tuning alignment */
+            top: -15px;
+        }
+
+        .coord-label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         #board {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
             display: grid;
             grid-template-columns: repeat(19, 30px);
             grid-template-rows: repeat(19, 30px);
@@ -250,7 +285,11 @@
                     <button id="select-second">Play Second (White)</button>
                 </div>
             </div>
-            <div id="board"></div>
+            <div id="board-wrapper">
+                <div id="row-labels"></div>
+                <div id="col-labels"></div>
+                <div id="board"></div>
+            </div>
             <div id="score"></div>
             <div id="ai-progress"></div>
             <div id="ai-evaluation-display"></div>
@@ -431,6 +470,20 @@
 
         // --- Initial Setup ---
         function initializeGame() {
+            // Create board labels
+            const rowLabels = document.getElementById('row-labels');
+            const colLabels = document.getElementById('col-labels');
+            for (let i = 0; i < 19; i++) {
+                const rowLabel = document.createElement('div');
+                rowLabel.textContent = i;
+                rowLabel.classList.add('coord-label');
+                rowLabels.appendChild(rowLabel);
+                const colLabel = document.createElement('div');
+                colLabel.textContent = i;
+                colLabel.classList.add('coord-label');
+                colLabels.appendChild(colLabel);
+            }
+
             playerSelectionDiv.style.display = "none";
             difficultySelectionDiv.style.display = "none";
             aiProgressElement.style.display = 'none';
