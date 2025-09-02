@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomoku</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        #main-game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-controls {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column; /* Align items vertically */
+            align-items: center;
+            gap: 10px;
+        }
+
+        #game-controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        #game-controls button:hover {
+            background-color: #45a049;
+        }
+
+        #player-selection, #difficulty-selection {
+            display: none; /* Hidden by default, shown by JS */
+            gap: 10px;
+        }
+
+        #player-selection button {
+            background-color: #008CBA;
+        }
+
+        #player-selection button:hover {
+            background-color: #007B9A;
+        }
+
+        #difficulty-selection button {
+            background-color: #f44336;
+        }
+
+        #difficulty-selection button:hover {
+            background-color: #da190b;
+        }
+
+        #difficulty-selection button.active {
+            background-color: #af140a; /* Darker shade for active button */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            grid-template-rows: repeat(19, 30px);
+            background-color: #d2b48c; /* Wood color */
+            border: 2px solid black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        .cell:nth-child(19n) {
+            border-right: none;
+        }
+
+        .cell:nth-last-child(-n + 19) {
+            border-bottom: none;
+        }
+
+        .stone {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: -13px;
+            left: -13px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .black {
+            background-color: black;
+        }
+
+        .white {
+            background-color: white;
+        }
+
+        .last-move::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid white;
+        }
+
+        .hover-square {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            top: -14px;
+            left: -14px;
+            border: 1px solid red;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        #score, #ai-progress {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            min-height: 22px;
+        }
+
+        #ai-progress {
+            color: #f44336;
+        }
+
+        #ai-evaluation-display {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            grid-template-rows: repeat(19, 30px);
+            border: 1px solid #ccc;
+            font-size: 10px;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .eval-cell {
+            border: 1px solid #eee;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        #minimax-visualization {
+            margin-top: 20px;
+            width: 600px;
+            height: 800px; /* Or whatever height you prefer */
+            overflow: auto;
+            border: 1px solid #999;
+            background-color: #fff;
+            padding: 10px;
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Simple Indented List for Tree View */
+        .tree-container ul {
+            list-style-type: none;
+            padding-left: 20px; /* Indentation for children */
+        }
+
+        .tree-container li {
+            margin: 8px 0;
+        }
+
+        .node-content {
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+            border: 1px solid #ccc;
+        }
+
+        .node-content span {
+            margin-right: 15px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .max-node > .node-content {
+            background-color: #e3f2fd; /* Light blue for Max nodes */
+            border-color: #90caf9;
+        }
+
+        .min-node > .node-content {
+            background-color: #ffebee; /* Light red for Min nodes */
+            border-color: #ef9a9a;
+        }
+
+        .pruned > .node-content {
+            background-color: #e0e0e0; /* Gray for pruned nodes */
+            border-color: #bdbdbd;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Gomoku with Minimax Visualization</h1>
+    <div id="game-container">
+        <div id="main-game">
+            <div id="game-controls">
+                <button id="start-game">Start Game</button>
+                <div id="difficulty-selection">
+                    <button class="difficulty-btn" data-depth="1">Easy</button>
+                    <button class="difficulty-btn active" data-depth="2">Medium</button>
+                    <button class="difficulty-btn" data-depth="3">Hard</button>
+                </div>
+                <div id="player-selection">
+                    <button id="select-first">Play First (Black)</button>
+                    <button id="select-second">Play Second (White)</button>
+                </div>
+            </div>
+            <div id="board"></div>
+            <div id="score"></div>
+            <div id="ai-progress"></div>
+            <div id="ai-evaluation-display"></div>
+        </div>
+        <div id="minimax-visualization">
+            <h2>AI Decision Tree</h2>
+            <p>The AI's decision-making process will be shown here after it moves.</p>
+        </div>
+    </div>
+
+    <script src="ai.js"></script>
+    <script src="threebythree.js"></script>
+    <script src="visualizer.js"></script>
+    <script>
+        // --- Global Variables ---
+        const boardElement = document.getElementById("board");
+        const startGameButton = document.getElementById("start-game");
+        const playerSelectionDiv = document.getElementById("player-selection");
+        const selectFirstButton = document.getElementById("select-first");
+        const selectSecondButton = document.getElementById("select-second");
+        const scoreDiv = document.getElementById("score");
+        const aiEvaluationDisplay = document.getElementById("ai-evaluation-display");
+        const difficultySelectionDiv = document.getElementById("difficulty-selection");
+        const aiProgressElement = document.getElementById("ai-progress");
+
+        let board = [];
+        let currentPlayer = PLAYER_BLACK;
+        let playerColor = null;
+        let gameStarted = false;
+        let gameEnded = false;
+        let searchDepth = 2; // Default to Medium
+        let playerWins = 0;
+        let aiWins = 0;
+        let lastMove = null; // To store the last move {r, c}
+
+        // --- Game Logic ---
+        function resetGame() {
+            board = Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(EMPTY));
+            currentPlayer = PLAYER_BLACK;
+            gameEnded = false;
+            lastMove = null;
+            renderBoard();
+            updateScoreDisplay();
+            aiProgressElement.style.display = 'none';
+            aiEvaluationDisplay.innerHTML = "";
+            displayTree(null); // Clear the visualization
+        }
+
+        function isValidMove(row, col) {
+            if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+                return false;
+            }
+            if (board[row][col] !== EMPTY) {
+                return false;
+            }
+            return true;
+        }
+
+        function makeMove(row, col, player) {
+            board[row][col] = player;
+            lastMove = { r: row, c: col };
+        }
+
+        // --- UI Rendering ---
+        function renderBoard() {
+            boardElement.innerHTML = "";
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.addEventListener("click", handleCellClick);
+                    cell.addEventListener("mouseover", handleCellHover);
+                    cell.addEventListener("mouseout", handleCellOut);
+
+                    if (board[r][c] !== EMPTY) {
+                        const stone = document.createElement("div");
+                        stone.classList.add("stone", board[r][c] === PLAYER_BLACK ? "black" : "white");
+                        if (lastMove && r === lastMove.r && c === lastMove.c) {
+                            stone.classList.add("last-move");
+                        }
+                        cell.appendChild(stone);
+                    }
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function updateScoreDisplay() {
+            scoreDiv.textContent = `Player Wins: ${playerWins} | AI Wins: ${aiWins}`;
+        }
+
+        // --- Event Handlers ---
+        async function handleCellClick(event) {
+            if (!gameStarted || gameEnded || playerColor === null || currentPlayer !== playerColor) {
+                return;
+            }
+
+            const cell = event.currentTarget;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+
+            if (!isValidMove(row, col)) {
+                return;
+            }
+
+            if (isThreeByThree(board, row, col, currentPlayer)) {
+                alert("3x3 위치에는 돌을 둘 수 없습니다.");
+                return;
+            }
+
+            makeMove(row, col, currentPlayer);
+            renderBoard();
+
+            if (checkWin(row, col, currentPlayer, board)) {
+                alert(playerColor === PLAYER_BLACK ? "You (Black) win!" : "You (White) win!");
+                playerWins++;
+                gameEnded = true;
+                updateScoreDisplay();
+                startGameButton.style.display = "block";
+                return;
+            }
+
+            currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
+            
+            if (!gameEnded) {
+                triggerAIMove(); // Immediately trigger AI move evaluation and visualization
+            }
+        }
+
+        async function triggerAIMove() {
+            // AI starts thinking, progress bar is shown inside getAIMove
+            const result = await getAIMove(board, searchDepth);
+
+            if (result && result.move) {
+                // 1. Show the thought process first
+                displayTree(result.tree);
+
+                // 2. Pause for the user to see the tree
+                await new Promise(resolve => setTimeout(resolve, 500)); // 0.5s delay
+
+                // 3. Make the move
+                makeMove(result.move.r, result.move.c, currentPlayer);
+                renderBoard();
+
+                // 4. Check for win & switch player
+                if (checkWin(result.move.r, result.move.c, currentPlayer, board)) {
+                    alert("AI wins!");
+                    aiWins++;
+                    gameEnded = true;
+                    updateScoreDisplay();
+                    startGameButton.style.display = "block";
+                }
+                currentPlayer = (currentPlayer === PLAYER_BLACK) ? PLAYER_WHITE : PLAYER_BLACK;
+            } else {
+                alert("It's a draw!");
+                gameEnded = true;
+                startGameButton.style.display = "block";
+            }
+        }
+
+        function handleCellHover(event) {
+            const cell = event.currentTarget;
+            if (isValidMove(parseInt(cell.dataset.row), parseInt(cell.dataset.col))) {
+                const hoverSquare = document.createElement("div");
+                hoverSquare.classList.add("hover-square");
+                cell.appendChild(hoverSquare);
+            }
+        }
+
+        function handleCellOut(event) {
+            const hoverSquare = event.currentTarget.querySelector(".hover-square");
+            if (hoverSquare) {
+                hoverSquare.remove();
+            }
+        }
+
+        // --- Initial Setup ---
+        function initializeGame() {
+            playerSelectionDiv.style.display = "none";
+            difficultySelectionDiv.style.display = "none";
+            aiProgressElement.style.display = 'none';
+
+            startGameButton.addEventListener("click", () => {
+                gameStarted = true;
+                gameEnded = false;
+                resetGame();
+                startGameButton.style.display = "none";
+                playerSelectionDiv.style.display = "flex";
+                difficultySelectionDiv.style.display = "flex";
+            });
+
+            difficultySelectionDiv.addEventListener("click", (event) => {
+                if (event.target.classList.contains("difficulty-btn")) {
+                    searchDepth = parseInt(event.target.dataset.depth);
+                    const currentActive = difficultySelectionDiv.querySelector(".active");
+                    if (currentActive) currentActive.classList.remove("active");
+                    event.target.classList.add("active");
+                }
+            });
+
+            selectFirstButton.addEventListener("click", () => {
+                playerColor = PLAYER_BLACK;
+                playerSelectionDiv.style.display = "none";
+                difficultySelectionDiv.style.display = "none";
+            });
+
+            selectSecondButton.addEventListener("click", () => {
+                playerColor = PLAYER_WHITE;
+                playerSelectionDiv.style.display = "none";
+                difficultySelectionDiv.style.display = "none";
+                currentPlayer = PLAYER_BLACK;
+                setTimeout(triggerAIMove, 50);
+            });
+
+            resetGame();
+        }
+
+        document.addEventListener("DOMContentLoaded", initializeGame);
+    </script>
+</body>
+</html>
