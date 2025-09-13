@@ -1,0 +1,22 @@
+{
+  "name": "geminitest",
+  "version": "1.0.0",
+  "main": "ai.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wonyongHwang/kopoomok.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wonyongHwang/kopoomok/issues"
+  },
+  "homepage": "https://github.com/wonyongHwang/kopoomok#readme",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.3"
+  }
+}
