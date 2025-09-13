@@ -20,15 +20,33 @@ Once the server is running, you can access the game at `http://localhost:8000`.
 
 The project includes end-to-end tests written with Playwright.
 
-To run the tests, follow these steps:
+#### Prerequisites
 
-1.  **Install dependencies:**
+Before running the tests, you need to install the project dependencies and the Playwright browsers.
+
+1.  **Install Dependencies:**
+    The `npm install` command installs all the necessary packages defined in the `package.json` file, which includes Playwright.
+
     ```sh
     npm install
     ```
 
-2.  **Run the tests:**
+2.  **Install Playwright Browsers:**
+    This command downloads the browser binaries (Chromium, Firefox, WebKit) that Playwright uses for testing.
+
+    ```sh
+    npx playwright install
+    ```
+
+#### Running the Tests
+
+1.  **Start the web server:**
     Make sure the web server is running on port 8000 as described above.
+    ```sh
+    python3 -m http.server 8000 &
+    ```
+
+2.  **Run the tests:**
     ```sh
     npx playwright test
     ```
