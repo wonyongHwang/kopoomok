@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>알파-베타 가지치기 코드 중심 해설</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+    .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        position: relative;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+    }
+    .header {
+        background-color: #24292e;
+        color: white;
+        padding: 20px 40px;
+    }
+    .title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .subtitle {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+    .content {
+        display: flex;
+        padding: 20px 40px;
+        flex-grow: 1;
+    }
+    .code-panel {
+        width: 60%;
+        background-color: #282c34;
+        border-radius: 8px;
+        padding: 15px;
+        margin-right: 20px;
+        overflow: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    .code-title {
+        color: #e6e6e6;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #444;
+    }
+    .code-title i {
+        margin-right: 10px;
+        color: #61dafb;
+    }
+    .code-block {
+        font-family: 'Consolas', 'Monaco', monospace;
+        color: #e6e6e6;
+        line-height: 1.6;
+        white-space: pre;
+        font-size: 0.9rem;
+    }
+    .code-comment {
+        color: #7d8799;
+    }
+    .code-keyword {
+        color: #c678dd;
+    }
+    .code-function {
+        color: #61afef;
+    }
+    .code-string {
+        color: #98c379;
+    }
+    .code-number {
+        color: #d19a66;
+    }
+    .code-variable {
+        color: #e06c75;
+    }
+    .code-highlight {
+        background-color: rgba(97, 175, 239, 0.1);
+        padding: 2px 0;
+    }
+    .explanation-panel {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+    }
+    .explanation-box {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 15px;
+        margin-bottom: 15px;
+        flex-grow: 0;
+    }
+    .explanation-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0366d6;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .explanation-title i {
+        margin-right: 10px;
+    }
+    .explanation-list {
+        padding-left: 15px;
+        margin-bottom: 0;
+    }
+    .explanation-item {
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    .explanation-item:last-child {
+        margin-bottom: 0;
+    }
+    .code-annotation {
+        color: #61dafb;
+        user-select: none;
+        cursor: pointer;
+    }
+    .footer {
+        background-color: #f1f1f1;
+        padding: 10px 40px;
+        font-size: 0.9rem;
+        color: #555;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .numbered-line {
+        display: flex;
+    }
+    .line-number {
+        color: #636d83;
+        text-align: right;
+        padding-right: 10px;
+        user-select: none;
+        min-width: 30px;
+    }
+    .line-content {
+        white-space: pre;
+        flex-grow: 1;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">알파-베타 가지치기 코드 중심 해설</h1>
+<p class="subtitle">getAIMove와 minimax 함수의 실제 구현과 노드 구조 분석</p>
+</div>
+<div class="content">
+<div class="code-panel">
+<div class="code-title"><i class="fas fa-code"></i> ai.js - getAIMove와 minimax 함수 구현</div>
+<div class="code-block">
+<div class="numbered-line code-highlight">
+<span class="line-number">1</span>
+<span class="line-content"><span class="code-keyword">async function</span> <span class="code-function">getAIMove</span>(currentBoard, depth = <span class="code-number">2</span>) {</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">2</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">possibleMoves</span> = getPossibleMoves(currentBoard, AI_PLAYER);</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">3</span>
+<span class="line-content"> <span class="code-keyword">let</span> <span class="code-variable">bestScore</span> = -Infinity;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">4</span>
+<span class="line-content"> <span class="code-keyword">let</span> <span class="code-variable">bestMove</span> = <span class="code-keyword">null</span>;</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">5</span>
+<span class="line-content"></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">6</span>
+<span class="line-content"> <span class="code-keyword">for</span> (<span class="code-keyword">const</span> move <span class="code-keyword">of</span> possibleMoves) {</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">7</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">currentBoardCopy</span> = [...currentBoard];</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">8</span>
+<span class="line-content">   currentBoardCopy[move] = AI_PLAYER; <span class="code-comment">// 가상 착수</span></span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">9</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">result</span> = minimax(currentBoardCopy, depth, -Infinity, Infinity, <span class="code-keyword">false</span>);</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">10</span>
+<span class="line-content"> <span class="code-keyword">if</span> (result.score &gt; bestScore) {</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">11</span>
+<span class="line-content">     bestScore = result.score;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">12</span>
+<span class="line-content">     bestMove = move;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">13</span>
+<span class="line-content">     treeData = result.node; <span class="code-comment">// 시각화를 위한 트리 데이터 저장</span></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">14</span>
+<span class="line-content">   }</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">15</span>
+<span class="line-content"> }</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">16</span>
+<span class="line-content"> <span class="code-keyword">return</span> { move: bestMove, tree: treeData };</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">17</span>
+<span class="line-content">}</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">18</span>
+<span class="line-content"></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">19</span>
+<span class="line-content"><span class="code-keyword">function</span> <span class="code-function">minimax</span>(board, depth, alpha, beta, isMaximizing, parentMove = <span class="code-keyword">null</span>) {</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">20</span>
+<span class="line-content"> <span class="code-comment">// 노드 메타데이터 생성 (트리 시각화용)</span></span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">21</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">node</span> = {</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">22</span>
+<span class="line-content">   isMaximizing,</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">23</span>
+<span class="line-content">   alpha,</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">24</span>
+<span class="line-content">   beta,</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">25</span>
+<span class="line-content">   children: [],</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">26</span>
+<span class="line-content">   pruned: <span class="code-keyword">false</span>,</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">27</span>
+<span class="line-content">   parentMove</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">28</span>
+<span class="line-content"> };</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">29</span>
+<span class="line-content"></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">30</span>
+<span class="line-content"> <span class="code-comment">// 종료 조건: 최대 깊이 도달 또는 승리/패배 상태</span></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">31</span>
+<span class="line-content"> <span class="code-keyword">if</span> (depth === <span class="code-number">0</span> || checkWin(board)) {</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">32</span>
+<span class="line-content">   node.score = evaluateBoard(board);</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">33</span>
+<span class="line-content"> <span class="code-keyword">return</span> { score: node.score, node };</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">34</span>
+<span class="line-content"> }</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">35</span>
+<span class="line-content"></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">36</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">possibleMoves</span> = getPossibleMoves(board, </span>
+</div>
+<div class="numbered-line">
+<span class="line-number">37</span>
+<span class="line-content">                           isMaximizing ? AI_PLAYER : HUMAN_PLAYER);</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">38</span>
+<span class="line-content"></span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">39</span>
+<span class="line-content"> <span class="code-comment">// MAX 노드 (컴퓨터 차례)</span></span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">40</span>
+<span class="line-content"> <span class="code-keyword">if</span> (isMaximizing) {</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">41</span>
+<span class="line-content"> <span class="code-keyword">let</span> <span class="code-variable">maxEval</span> = -Infinity;</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">42</span>
+<span class="line-content"> </span>
+</div>
+<div class="numbered-line">
+<span class="line-number">43</span>
+<span class="line-content"> <span class="code-keyword">for</span> (<span class="code-keyword">const</span> move <span class="code-keyword">of</span> possibleMoves) {</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">44</span>
+<span class="line-content">     board[move] = AI_PLAYER;</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">45</span>
+<span class="line-content"> <span class="code-keyword">const</span> <span class="code-variable">child</span> = minimax(board, depth - <span class="code-number">1</span>, alpha, beta, <span class="code-keyword">false</span>, move);</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">46</span>
+<span class="line-content">     board[move] = <span class="code-number">0</span>; <span class="code-comment">// 되돌리기</span></span>
+</div>
+<div class="numbered-line">
+<span class="line-number">47</span>
+<span class="line-content"> </span>
+</div>
+<div class="numbered-line">
+<span class="line-number">48</span>
+<span class="line-content">     node.children.push(child.node);</span>
+</div>
+<div class="numbered-line">
+<span class="line-number">49</span>
+<span class="line-content">     maxEval = Math.max(maxEval, child.score);</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">50</span>
+<span class="line-content">     alpha = Math.max(alpha, child.score);</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">51</span>
+<span class="line-content"> </span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">52</span>
+<span class="line-content"> <span class="code-comment">// 알파-베타 가지치기 (베타 컷)</span></span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">53</span>
+<span class="line-content"> <span class="code-keyword">if</span> (beta &lt;= alpha) {</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">54</span>
+<span class="line-content">       child.node.pruned = <span class="code-keyword">true</span>;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">55</span>
+<span class="line-content">       node.pruned = <span class="code-keyword">true</span>;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">56</span>
+<span class="line-content"> <span class="code-keyword">break</span>;</span>
+</div>
+<div class="numbered-line code-highlight">
+<span class="line-number">57</span>
+<span class="line-content">     }</span>
+</div>
+</div>
+</div>
+<div class="explanation-panel">
+<div class="explanation-box">
+<div class="explanation-title">
+<i class="fas fa-project-diagram"></i>노드 구조와 트리 구성
+</div>
+<ul class="explanation-list">
+<li class="explanation-item"><strong>노드 메타데이터</strong>: <code>{isMaximizing, alpha, beta, children, pruned, parentMove, score}</code></li>
+<li class="explanation-item"><strong>트리 시각화</strong>: 각 노드는 minimax 함수 호출마다 생성되어 트리를 구성</li>
+<li class="explanation-item"><strong>가지치기 추적</strong>: <code>pruned</code> 속성으로 어떤 가지가 잘렸는지 시각적으로 확인 가능</li>
+<li class="explanation-item"><strong>트리 반환</strong>: 최종 선택된 수의 트리 데이터를 visualizer.js를 통해 UI에 렌더링</li>
+</ul>
+</div>
+<div class="explanation-box">
+<div class="explanation-title">
+<i class="fas fa-sitemap"></i>getAIMove 함수 분석
+</div>
+<ul class="explanation-list">
+<li class="explanation-item"><strong>후보 생성</strong>: <code>getPossibleMoves()</code>를 통해 주변 빈칸 및 금수가 아닌 위치 선별</li>
+<li class="explanation-item"><strong>반복 탐색</strong>: 각 후보 위치에 대해 minimax 함수 호출 (초기 호출은 항상 <code>false</code>로 MIN 노드부터 시작)</li>
+<li class="explanation-item"><strong>최적 선택</strong>: 가장 높은 평가 점수를 가진 위치를 최종 선택</li>
+<li class="explanation-item"><strong>트리 저장</strong>: 선택된 수의 의사결정 트리를 시각화를 위해 저장</li>
+</ul>
+</div>
+<div class="explanation-box">
+<div class="explanation-title">
+<i class="fas fa-code-branch"></i>알파-베타 가지치기 로직
+</div>
+<ul class="explanation-list">
+<li class="explanation-item"><strong>MAX 노드</strong>: α = max(α, 자식 평가값), β ≤ α일 때 가지치기</li>
+<li class="explanation-item"><strong>MIN 노드</strong>: β = min(β, 자식 평가값), β ≤ α일 때 가지치기</li>
+<li class="explanation-item"><strong>직관적 설명</strong>: MAX 입장에서 현재 α보다 더 나은 대안이 있으면 선택하고, 그렇지 않은 경로는 탐색하지 않음</li>
+<li class="explanation-item"><strong>효과</strong>: 동일한 최적해를 유지하면서 탐색 공간을 최대 50% 이상 절약</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer">
+<div>알파-베타 가지치기는 미니맥스 알고리즘의 최적화 기법으로, 동일한 결과를 더 효율적으로 도출합니다.</div>
+<div><i class="fas fa-arrow-right"></i> 다음: 전체 호출 흐름도 및 구조도 시각화</div>
+</div>
+</div>
+</body>
+</html>
