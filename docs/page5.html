@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>난이도 시스템과 탐색 깊이</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #24292e;
+            color: white;
+            padding: 20px 40px;
+        }
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        .content {
+            display: flex;
+            padding: 30px 40px;
+            flex-grow: 1;
+        }
+        .text-section {
+            width: 55%;
+            padding-right: 30px;
+        }
+        .visual-section {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+        }
+        .info-list {
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            margin-bottom: 12px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .highlight-box {
+            background-color: #f0f6ff;
+            border-left: 4px solid #0366d6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .highlight-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0366d6;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Nanum Gothic Coding', monospace;
+            font-size: 0.9rem;
+            color: #333;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .difficulty-ui {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 90%;
+            margin-bottom: 20px;
+        }
+        .difficulty-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        .difficulty-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            width: 30%;
+            cursor: pointer;
+        }
+        .btn-easy {
+            background-color: #dcffe4;
+            color: #0a6e1f;
+            border: 1px solid #0a6e1f;
+        }
+        .btn-medium {
+            background-color: #fff2dc;
+            color: #a05e03;
+            border: 1px solid #a05e03;
+        }
+        .btn-hard {
+            background-color: #ffdcdc;
+            color: #c70000;
+            border: 1px solid #c70000;
+        }
+        .active {
+            background-color: #0366d6;
+            color: white;
+            border: 1px solid #0366d6;
+        }
+        .flow-diagram {
+            width: 90%;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .flow-box {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+        .flow-box:not(:last-child):after {
+            content: '↓';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #0366d6;
+        }
+        .flow-button {
+            background-color: #e1effe;
+            border: 1px solid #0366d6;
+            color: #0366d6;
+        }
+        .flow-variable {
+            background-color: #fff2dc;
+            border: 1px solid #a05e03;
+            color: #a05e03;
+        }
+        .flow-function {
+            background-color: #dcffe4;
+            border: 1px solid #0a6e1f;
+            color: #0a6e1f;
+        }
+        .flow-algorithm {
+            background-color: #ffdcdc;
+            border: 1px solid #c70000;
+            color: #c70000;
+        }
+        .depth-comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .depth-item {
+            width: 30%;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .depth-1 {
+            background-color: #dcffe4;
+            color: #0a6e1f;
+        }
+        .depth-2 {
+            background-color: #fff2dc;
+            color: #a05e03;
+        }
+        .depth-3 {
+            background-color: #ffdcdc;
+            color: #c70000;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px 40px;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">난이도 시스템과 탐색 깊이</h1>
+<p class="subtitle">AI의 탐색 깊이를 조절하는 난이도 시스템 구현과 영향 분석</p>
+</div>
+<div class="content">
+<div class="text-section">
+<div class="section-title">
+<i class="fas fa-cogs"></i>난이도 시스템 구현
+</div>
+<ul class="info-list">
+<li class="info-item">사용자는 UI에서 <strong>Easy</strong>, <strong>Medium</strong>, <strong>Hard</strong> 버튼을 통해 AI의 난이도를 선택할 수 있습니다.</li>
+<li class="info-item">각 난이도 버튼은 <code>data-depth</code> 속성으로 탐색 깊이(1, 2, 3)를 저장합니다.</li>
+<li class="info-item">선택된 난이도에 따라 전역 변수 <code>searchDepth</code>가 업데이트되어 AI에 전달됩니다.</li>
+</ul>
+<div class="code-block">// index.html 내부 난이도 선택 버튼
+&lt;div id="difficulty-selection"&gt;
+  &lt;button class="difficulty-btn" data-depth="1"&gt;Easy&lt;/button&gt;
+  &lt;button class="difficulty-btn active" data-depth="2"&gt;Medium&lt;/button&gt;
+  &lt;button class="difficulty-btn" data-depth="3"&gt;Hard&lt;/button&gt;
+&lt;/div&gt;
+
+// 전역 변수와 이벤트 리스너
+let searchDepth = 2; // 기본 Medium
+difficultySelectionDiv.addEventListener("click", (event) =&gt; {
+  if (event.target.classList.contains("difficulty-btn")) {
+    searchDepth = parseInt(event.target.dataset.depth);
+    // ... active 클래스 갱신
+  }
+});</div>
+<div class="section-title">
+<i class="fas fa-project-diagram"></i>난이도가 미니맥스에 미치는 영향
+</div>
+<ul class="info-list">
+<li class="info-item">난이도는 미니맥스 알고리즘의 <strong>초기 탐색 깊이(depth)</strong>를 결정합니다.</li>
+<li class="info-item">사용자가 수를 두면 <code>triggerAIMove()</code> 함수가 호출되고 <code>searchDepth</code> 값이 AI에 전달됩니다.</li>
+<li class="info-item"><code>getAIMove(board, searchDepth)</code>는 선택된 난이도에 따라 각 후보 수에 대해 미니맥스를 호출합니다.</li>
+</ul>
+<div class="highlight-box">
+<div class="highlight-title">ply(플라이)란?</div>
+<p>체스나 바둑 같은 게임에서 한 명의 플레이어가 한 번 두는 것을 의미합니다.</p>
+<ul style="margin-bottom: 0; padding-left: 15px;">
+<li>Easy (depth=1): AI는 자신의 한 수만 고려 (1 ply)</li>
+<li>Medium (depth=2): AI 한 수 → 상대 한 수까지 고려 (2 ply)</li>
+<li>Hard (depth=3): AI 한 수 → 상대 한 수 → AI 한 수까지 고려 (3 ply)</li>
+</ul>
+</div>
+</div>
+<div class="visual-section">
+<div class="difficulty-ui">
+<p class="font-bold text-center mb-2">난이도 선택 UI</p>
+<div class="difficulty-buttons">
+<div class="difficulty-btn btn-easy">Easy</div>
+<div class="difficulty-btn btn-medium active">Medium</div>
+<div class="difficulty-btn btn-hard">Hard</div>
+</div>
+<div class="depth-comparison">
+<div class="depth-item depth-1">
+<p class="font-bold">Easy</p>
+<p>depth = 1</p>
+<p>1 ply</p>
+</div>
+<div class="depth-item depth-2">
+<p class="font-bold">Medium</p>
+<p>depth = 2</p>
+<p>2 ply</p>
+</div>
+<div class="depth-item depth-3">
+<p class="font-bold">Hard</p>
+<p>depth = 3</p>
+<p>3 ply</p>
+</div>
+</div>
+</div>
+<div class="flow-diagram">
+<p class="font-bold text-center mb-2">난이도 설정 → AI 동작 흐름</p>
+<div class="flow-box flow-button">
+난이도 버튼 클릭
+</div>
+<div class="flow-box flow-variable">
+searchDepth 값 업데이트 (1/2/3)
+</div>
+<div class="flow-box flow-function">
+사용자가 두면 triggerAIMove() 호출
+</div>
+<div class="flow-box flow-function">
+getAIMove(board, searchDepth)
+</div>
+<div class="flow-box flow-algorithm">
+각 후보 수에 대해 minimax(board, depth, α, β, false)
+</div>
+<div class="flow-box flow-function">
+최적의 수 선택 및 반환
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div>평가식(evaluateBoard), 후보 생성(getPossibleMoves), 3×3 금수(isThreeByThree) 로직은 난이도와 무관하게 동작합니다.</div>
+<div><i class="fas fa-arrow-right"></i> 다음: 알파-베타 가지치기 코드 분석</div>
+</div>
+</div>
+</body>
+</html>
