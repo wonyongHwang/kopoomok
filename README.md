@@ -55,3 +55,12 @@ Before running the tests, you need to install the project dependencies and the P
     ```sh
     npx playwright show-report
     ```
+    
+#### 프로젝트 구조 슬라이드 (라이브 데모)
+[![미리보기](docs/page1.png)](https://wonyonghwang.github.io/kopoomok/page1.html)
+[![미리보기](docs/page2.png)](https://wonyonghwang.github.io/kopoomok/page2.html)
+[![미리보기](docs/page3.png)](https://wonyonghwang.github.io/kopoomok/page3.html)
+[![미리보기](docs/page4.png)](https://wonyonghwang.github.io/kopoomok/page4.html)
+[![미리보기](docs/page5.png)](https://wonyonghwang.github.io/kopoomok/page5.html)
+[![미리보기](docs/page6.png)](https://wonyonghwang.github.io/kopoomok/page6.html)
+[![미리보기](docs/page7.png)](https://wonyonghwang.github.io/kopoomok/page7.html)
