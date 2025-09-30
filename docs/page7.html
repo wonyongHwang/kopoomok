@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>전체 호출 흐름도 및 구조도</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+    .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        position: relative;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+    }
+    .header {
+        background-color: #24292e;
+        color: white;
+        padding: 20px 40px;
+    }
+    .title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .subtitle {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+    .content {
+        display: flex;
+        padding: 20px 40px;
+        flex-grow: 1;
+    }
+    .description-panel {
+        width: 35%;
+        padding-right: 30px;
+    }
+    .visualization-panel {
+        width: 65%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+    .concept-box {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .concept-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #0366d6;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+    .concept-title i {
+        margin-right: 10px;
+    }
+    .concept-list {
+        padding-left: 15px;
+        margin-bottom: 0;
+    }
+    .concept-item {
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+    .concept-item:last-child {
+        margin-bottom: 0;
+    }
+    .step-box {
+        background-color: #f0f6ff;
+        border-left: 4px solid #0366d6;
+        padding: 12px 15px;
+        margin: 15px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    .step-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .footer {
+        background-color: #f1f1f1;
+        padding: 15px 40px;
+        font-size: 0.9rem;
+        color: #555;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .flow-container {
+        position: relative;
+        width: 600px;
+        height: 480px;
+    }
+    .flow-node {
+        position: absolute;
+        width: 180px;
+        height: 60px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 1rem;
+        color: white;
+        text-align: center;
+    }
+    .user-node {
+        background-color: #6f42c1;
+    }
+    .game-node {
+        background-color: #0366d6;
+    }
+    .ai-node {
+        background-color: #28a745;
+    }
+    .ui-node {
+        background-color: #e36209;
+    }
+    .param-badge {
+        position: absolute;
+        background-color: rgba(255,255,255,0.9);
+        color: #333;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        top: -8px;
+        right: -8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .flow-arrow {
+        position: absolute;
+        width: 2px;
+        background-color: #555;
+    }
+    .flow-arrow:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: -4px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 8px solid #555;
+    }
+    .file-tag {
+        position: absolute;
+        font-size: 0.7rem;
+        background-color: #f8f9fa;
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">전체 호출 흐름도 및 구조도</h1>
+<p class="subtitle">사용자 착수부터 AI 응답까지의 완전한 흐름과 함수 간 상호작용</p>
+</div>
+<div class="content">
+<div class="description-panel">
+<div class="concept-box">
+<div class="concept-title">
+<i class="fas fa-sitemap"></i>호출 흐름 개요
+</div>
+<p>오목 게임에서 사용자가 착수한 후 AI가 응답하기까지의 전체 프로세스를 설명합니다. 난이도 설정에 따라 AI의 탐색 깊이가 결정됩니다.</p>
+</div>
+<div class="concept-box">
+<div class="concept-title">
+<i class="fas fa-code-branch"></i>핵심 함수 호출 순서
+</div>
+<ul class="concept-list">
+<li class="concept-item"><strong>사용자 착수</strong> → 유효성 검사 → 착수 처리</li>
+<li class="concept-item"><strong>triggerAIMove()</strong> → 현재 난이도에 따른 searchDepth 전달</li>
+<li class="concept-item"><strong>getAIMove(board, depth)</strong> → 후보 수 생성 및 평가</li>
+<li class="concept-item"><strong>minimax(board, depth, α, β, maximizing)</strong> → 최적 수 탐색</li>
+<li class="concept-item"><strong>evaluateBoard()</strong> → 보드 상태 평가</li>
+<li class="concept-item"><strong>결과 반환 및 UI 업데이트</strong> → 트리 시각화</li>
+</ul>
+</div>
+<div class="step-box">
+<div class="step-title">난이도 설정의 영향</div>
+<ul class="concept-list">
+<li><strong>Easy (depth=1)</strong>: 1수 앞을 내다봄</li>
+<li><strong>Medium (depth=2)</strong>: 2수 앞을 내다봄 (기본값)</li>
+<li><strong>Hard (depth=3)</strong>: 3수 앞을 내다봄</li>
+</ul>
+<p>난이도 버튼 → searchDepth → getAIMove → minimax 순으로 전달됩니다.</p>
+</div>
+</div>
+<div class="visualization-panel">
+<div class="flow-container">
+<!-- 사용자 인터랙션 -->
+<div class="flow-node user-node" style="top: 10px; left: 210px;">
+    사용자 착수
+</div>
+<div class="file-tag" style="top: 15px; left: 400px;">index.html</div>
+<!-- 게임 로직 -->
+<div class="flow-node game-node" style="top: 90px; left: 210px;">
+    유효성 검사 및 착수
+</div>
+<!-- triggerAIMove -->
+<div class="flow-node game-node" style="top: 170px; left: 210px;">
+    triggerAIMove()
+    <span class="param-badge">searchDepth</span>
+</div>
+<div class="file-tag" style="top: 175px; left: 400px;">index.html</div>
+<!-- getAIMove -->
+<div class="flow-node ai-node" style="top: 250px; left: 210px;">
+    getAIMove(board, depth)
+</div>
+<div class="file-tag" style="top: 255px; left: 400px;">ai.js</div>
+<!-- 병렬 노드: getPossibleMoves와 isThreeByThree -->
+<div class="flow-node ai-node" style="top: 330px; left: 80px; width: 160px;">
+    getPossibleMoves()
+    <span class="param-badge">주변 빈칸</span>
+</div>
+<div class="file-tag" style="top: 335px; left: 10px;">ai.js</div>
+<div class="flow-node ai-node" style="top: 330px; left: 360px; width: 160px;">
+    isThreeByThree()
+    <span class="param-badge">금수 체크</span>
+</div>
+<div class="file-tag" style="top: 335px; left: 530px;">threebythree.js</div>
+<!-- minimax -->
+<div class="flow-node ai-node" style="top: 410px; left: 210px;">
+    minimax(depth, α, β, ...)
+</div>
+<div class="file-tag" style="top: 415px; left: 400px;">ai.js</div>
+<!-- UI 업데이트 -->
+<div class="flow-node ui-node" style="top: 490px; left: 210px;">
+    결과 반환 및 UI 업데이트
+</div>
+<div class="file-tag" style="top: 495px; left: 400px;">visualizer.js</div>
+<!-- 화살표 연결선 -->
+<!-- 사용자→유효성 검사 -->
+<div class="flow-arrow" style="top: 70px; left: 300px; height: 20px;"></div>
+<!-- 유효성 검사→triggerAIMove -->
+<div class="flow-arrow" style="top: 150px; left: 300px; height: 20px;"></div>
+<!-- triggerAIMove→getAIMove -->
+<div class="flow-arrow" style="top: 230px; left: 300px; height: 20px;"></div>
+<!-- getAIMove→getPossibleMoves -->
+<div class="flow-arrow" style="top: 310px; left: 250px; height: 20px; transform: rotate(20deg);"></div>
+<!-- getAIMove→isThreeByThree -->
+<div class="flow-arrow" style="top: 310px; left: 350px; height: 20px; transform: rotate(-20deg);"></div>
+<!-- getPossibleMoves→minimax -->
+<div class="flow-arrow" style="top: 390px; left: 160px; height: 20px; transform: rotate(-20deg);"></div>
+<!-- isThreeByThree→minimax -->
+<div class="flow-arrow" style="top: 390px; left: 440px; height: 20px; transform: rotate(20deg);"></div>
+<!-- minimax→UI 업데이트 -->
+<div class="flow-arrow" style="top: 470px; left: 300px; height: 20px;"></div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div>난이도(searchDepth)는 미니맥스의 초기 탐색 깊이를 결정합니다: Easy(1), Medium(2), Hard(3)</div>
+<div><i class="fas fa-code"></i> 알파-베타 가지치기와 평가함수로 최적의 수를 선택합니다</div>
+</div>
+</div>
+</body>
+</html>
