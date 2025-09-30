@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>프로젝트 전체 구조 및 파일별 역할</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #24292e;
+            color: white;
+            padding: 20px 40px;
+        }
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        .content {
+            display: flex;
+            padding: 30px 40px;
+            flex-grow: 1;
+        }
+        .text-section {
+            width: 50%;
+            padding-right: 30px;
+        }
+        .visual-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+        }
+        .info-list {
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            margin-bottom: 12px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .highlight-box {
+            background-color: #f0f6ff;
+            border-left: 4px solid #0366d6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .highlight-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0366d6;
+        }
+        .file-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .file-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        .file-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .file-desc {
+            padding-left: 36px;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        .architecture-diagram {
+            width: 90%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .code-preview {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.8rem;
+            color: #24292e;
+            overflow: hidden;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        .code-comment {
+            color: #6a737d;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px 40px;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">프로젝트 전체 구조 및 파일별 역할</h1>
+<p class="subtitle">오목 게임 구현의 소스 코드 구조 이해</p>
+</div>
+<div class="content">
+<div class="text-section">
+<div class="section-title">
+<i class="fas fa-project-diagram"></i>프로젝트 구조 개요
+</div>
+<ul class="info-list">
+<li class="info-item">오목 게임은 클라이언트 사이드 웹 애플리케이션으로 구현됨</li>
+<li class="info-item">3개의 주요 파일(HTML, CSS, JavaScript)로 구성된 프론트엔드 프로젝트</li>
+<li class="info-item">모듈화된 구조로 게임 로직과 AI 로직이 분리되어 관리됨</li>
+</ul>
+<div class="file-card">
+<div class="file-header">
+<div class="file-icon"><i class="fas fa-file-code" style="color: #e44d26;"></i></div>
+<div class="file-name">index.html</div>
+</div>
+<div class="file-desc">
+<p>게임 UI 구성 요소와 게임판 구조 정의</p>
+<ul class="info-list" style="margin-top: 8px;">
+<li class="info-item">오목판 레이아웃 및 게임 인터페이스 마크업</li>
+<li class="info-item">외부 스타일시트 및 스크립트 파일 연결</li>
+<li class="info-item">게임 상태 표시 및 사용자 컨트롤 정의</li>
+</ul>
+</div>
+</div>
+<div class="file-card">
+<div class="file-header">
+<div class="file-icon"><i class="fas fa-file-code" style="color: #f7df1e;"></i></div>
+<div class="file-name">script.js</div>
+</div>
+<div class="file-desc">
+<p>게임 진행 로직 및 사용자 상호작용 처리</p>
+<ul class="info-list" style="margin-top: 8px;">
+<li class="info-item">게임판 초기화 및 렌더링 함수</li>
+<li class="info-item">사용자 입력 처리(클릭 이벤트 등)</li>
+<li class="info-item">게임 상태 관리 및 승리 조건 확인</li>
+<li class="info-item">ai.js와 연결하여 AI 턴 처리</li>
+</ul>
+</div>
+</div>
+<div class="file-card">
+<div class="file-header">
+<div class="file-icon"><i class="fas fa-file-code" style="color: #5468ff;"></i></div>
+<div class="file-name">ai.js</div>
+</div>
+<div class="file-desc">
+<p>AI 의사결정 알고리즘과 평가 함수 구현</p>
+<ul class="info-list" style="margin-top: 8px;">
+<li class="info-item">미니맥스 알고리즘 및 알파-베타 가지치기 구현</li>
+<li class="info-item">게임판 상태 평가 함수(evaluateBoard, evaluatePlayerBoard)</li>
+<li class="info-item">최적의 수 결정 로직(minimax 함수)</li>
+<li class="info-item">승리 패턴 및 전략적 위치 검사(checkDirection, lineCheck)</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="visual-section">
+<svg class="architecture-diagram" viewbox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrowhead" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+<polygon fill="#333" points="0 0, 10 3.5, 0 7"></polygon>
+</marker>
+</defs>
+<!-- 파일 박스 -->
+<rect fill="#e9ecef" height="60" rx="8" stroke="#495057" width="160" x="120" y="50"></rect>
+<text font-size="16" font-weight="bold" text-anchor="middle" x="200" y="80">index.html</text>
+<text font-size="12" text-anchor="middle" x="200" y="100">UI 구성 및 마크업</text>
+<rect fill="#e9ecef" height="60" rx="8" stroke="#495057" width="140" x="50" y="170"></rect>
+<text font-size="16" font-weight="bold" text-anchor="middle" x="120" y="200">script.js</text>
+<text font-size="12" text-anchor="middle" x="120" y="220">게임 로직 처리</text>
+<rect fill="#e9ecef" height="60" rx="8" stroke="#495057" width="140" x="210" y="170"></rect>
+<text font-size="16" font-weight="bold" text-anchor="middle" x="280" y="200">ai.js</text>
+<text font-size="12" text-anchor="middle" x="280" y="220">AI 알고리즘 구현</text>
+<!-- 화살표 연결 -->
+<line marker-end="url(#arrowhead)" stroke="#333" stroke-width="2" x1="180" x2="140" y1="110" y2="170"></line>
+<line marker-end="url(#arrowhead)" stroke="#333" stroke-width="2" x1="220" x2="260" y1="110" y2="170"></line>
+<line marker-end="url(#arrowhead)" stroke="#333" stroke-width="2" x1="190" x2="210" y1="200" y2="200"></line>
+<!-- AI.js 상세 구조 -->
+<rect fill="#f8f9fa" height="100" rx="8" stroke="#495057" stroke-dasharray="4" width="200" x="100" y="280"></rect>
+<text font-size="14" font-weight="bold" text-anchor="middle" x="200" y="300">ai.js 핵심 함수</text>
+<text font-size="12" text-anchor="middle" x="200" y="325">• minimax()</text>
+<text font-size="12" text-anchor="middle" x="200" y="345">• evaluateBoard()</text>
+<text font-size="12" text-anchor="middle" x="200" y="365">• isWinningMove()</text>
+<!-- 연결선 -->
+<line marker-end="url(#arrowhead)" stroke="#333" stroke-width="2" x1="280" x2="240" y1="230" y2="280"></line>
+</svg>
+<div class="code-preview">
+<span class="code-comment">// ai.js 핵심 코드 구조</span>
+function minimax(board, depth, alpha, beta, player, latestRow, latestCol) {
+  <span class="code-comment">// 재귀 탈출 조건</span>
+  if (depth === 0) {
+    const val = evaluateBoard(board, latestRow, latestCol);
+    return [val, -1];
+  }
+  
+  <span class="code-comment">// 승리 상태 확인</span>
+  if (isWinningMove(board, opponent, latestRow, latestCol)) {
+    return [player === COMP ? 1000000 : -1000000, -1];
+  }
+  
+  <span class="code-comment">// 최적의 수 탐색 및 알파-베타 가지치기</span>
+  for (let row = 0; row &lt; ROWS; row++) {
+    for (let col = 0; col &lt; COLS; col++) {
+      <span class="code-comment">// 가능한 수에 대한 평가 및 가지치기</span>
+      if (beta &lt;= alpha) {
+        <span class="code-comment">// 탐색 중단</span>
+      }
+    }
+  }
+}
+</div>
+</div>
+</div>
+<div class="footer">
+<div>3개의 핵심 파일이 서로 연결되어 작동하는 구조로 AI가 오목 게임에 통합됩니다.</div>
+<div><i class="fas fa-arrow-right"></i> 다음: ai.js 상세 분석</div>
+</div>
+</div>
+</body>
+</html>
