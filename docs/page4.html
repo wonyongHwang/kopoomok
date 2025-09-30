@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>파일별 역할 상세 설명</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #24292e;
+            color: white;
+            padding: 20px 40px;
+        }
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        .content {
+            display: flex;
+            padding: 30px 40px;
+            flex-grow: 1;
+        }
+        .text-section {
+            width: 55%;
+            padding-right: 30px;
+        }
+        .visual-section {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+        }
+        .info-list {
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            margin-bottom: 12px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .highlight-box {
+            background-color: #f0f6ff;
+            border-left: 4px solid #0366d6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .highlight-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0366d6;
+        }
+        .file-box {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .file-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            color: #24292e;
+            margin-bottom: 10px;
+        }
+        .file-name i {
+            margin-right: 10px;
+        }
+        .file-desc {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .file-function {
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .file-interaction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .interaction-diagram {
+            width: 95%;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .diagram-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .file-node {
+            padding: 12px;
+            border-radius: 6px;
+            min-width: 150px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .html-file {
+            background-color: #e34c26;
+            color: white;
+        }
+        .js-file {
+            background-color: #f1e05a;
+            color: #333;
+        }
+        .arrow-down {
+            width: 2px;
+            height: 40px;
+            background-color: #555;
+            margin: 5px 0;
+            position: relative;
+        }
+        .arrow-down:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #555;
+        }
+        .arrow-label {
+            font-size: 0.8rem;
+            color: #666;
+            position: absolute;
+            background-color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px 40px;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">파일별 역할 상세 설명</h1>
+<p class="subtitle">오목 게임 소스코드의 각 파일별 핵심 기능과 상호작용 흐름</p>
+</div>
+<div class="content">
+<div class="text-section">
+<div class="file-box">
+<div class="file-name">
+<i class="fas fa-file-code text-orange-500"></i>index.html
+</div>
+<p class="file-desc">사용자 인터페이스와 게임 루프를 관리하는 핵심 파일</p>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 보드, 버튼, 좌표 레이블, 점수, 진행률, 트리 시각화 UI 구성</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 사용자 돌 두기 → 유효성 검사 → 착수 → 승리 체크 → triggerAIMove() 호출</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 난이도 버튼(Easy/Medium/Hard)으로 탐색 깊이 조절</div>
+</div>
+<div class="file-box">
+<div class="file-name">
+<i class="fas fa-file-code text-yellow-500"></i>ai.js
+</div>
+<p class="file-desc">인공지능의 핵심 로직을 담당하는 파일</p>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> <strong>getPossibleMoves()</strong>: 주변 빈칸만 후보 수 생성, 3×3 금수 필터 적용</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> <strong>evaluateBoard()</strong>: 가로/세로/대각 6칸 윈도우 패턴 가중치로 평가</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> <strong>minimax()</strong>: 미니맥스 알고리즘 + 알파-베타 가지치기 구현</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> <strong>getAIMove()</strong>: 진행률/트리 데이터 생성/히트맵 표시 기능</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> <strong>checkWin()</strong>: 승리 조건 판정 로직</div>
+</div>
+<div class="file-box">
+<div class="file-name">
+<i class="fas fa-file-code text-blue-500"></i>threebythree.js
+</div>
+<p class="file-desc">3×3 금수 판정을 위한 유틸리티 파일</p>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 정규식과 패턴 매칭을 활용한 금수 판정</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 흑돌의 쌍삼, 쌍사, 장목 등 렌주룰 검사</div>
+</div>
+<div class="file-box">
+<div class="file-name">
+<i class="fas fa-file-code text-purple-500"></i>visualizer.js
+</div>
+<p class="file-desc">미니맥스 알고리즘의 동작을 시각화하는 파일</p>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> minimax가 생성한 트리 구조 시각화(알파, 베타, 점수, 가지치기, 착수 위치)</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> &lt;ul&gt; 태그 구조로 트리 계층 렌더링</div>
+<div class="file-function"><i class="fas fa-check text-green-500"></i> 가지치기(pruning) 발생 지점 강조 표시</div>
+</div>
+</div>
+<div class="visual-section">
+<div class="section-title">
+<i class="fas fa-project-diagram"></i>파일 간 상호작용 흐름
+</div>
+<div class="file-interaction">
+<div class="interaction-diagram">
+<div class="diagram-row">
+<div class="file-node html-file">index.html</div>
+</div>
+<div class="arrow-down" style="margin: 0 auto;">
+<span class="arrow-label" style="right: 10px;">사용자 착수 → 유효성 검사</span>
+</div>
+<div class="diagram-row">
+<div class="file-node js-file">threebythree.js</div>
+</div>
+<div class="arrow-down" style="margin: 0 auto;">
+<span class="arrow-label" style="left: 10px;">금수 판정 결과 반환</span>
+</div>
+<div class="diagram-row">
+<div class="file-node js-file">ai.js</div>
+</div>
+<div class="arrow-down" style="margin: 0 auto;">
+<span class="arrow-label" style="right: 10px;">최적의 수와 트리 정보 반환</span>
+</div>
+<div class="diagram-row">
+<div class="file-node js-file">visualizer.js</div>
+</div>
+<div class="arrow-down" style="margin: 0 auto;">
+<span class="arrow-label" style="left: 10px;">트리 시각화 데이터 전달</span>
+</div>
+<div class="diagram-row">
+<div class="file-node html-file">index.html (UI 업데이트)</div>
+</div>
+</div>
+<div class="highlight-box" style="margin-top: 20px; width: 100%;">
+<div class="highlight-title">주요 호출 흐름</div>
+<ol style="padding-left: 20px; margin: 0;">
+<li style="margin-bottom: 8px;">사용자가 돌을 두면 index.html에서 게임 상태 업데이트</li>
+<li style="margin-bottom: 8px;">AI 턴이면 <code>triggerAIMove()</code> → <code>getAIMove(board, searchDepth)</code> 호출</li>
+<li style="margin-bottom: 8px;"><code>getAIMove</code> 내부에서 각 후보 착수에 대해 <code>minimax</code> 호출</li>
+<li style="margin-bottom: 8px;">최적 수 선택 후 트리 정보가 <code>visualizer.js</code>로 전달되어 시각화</li>
+<li style="margin-bottom: 0;"><code>threebythree.js</code>는 유효성 검사 단계에서 금수 판정에 활용</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div>파일 간의 모듈화와 책임 분리를 통해 코드 유지보수성과 확장성이 향상됩니다.</div>
+<div><i class="fas fa-arrow-right"></i> 다음: 난이도 시스템과 탐색 깊이</div>
+</div>
+</div>
+</body>
+</html>
