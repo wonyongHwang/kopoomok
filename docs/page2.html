@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ai.js 핵심 함수와 설계 원리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #24292e;
+            color: white;
+            padding: 20px 40px;
+        }
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        .content {
+            display: flex;
+            padding: 30px 40px;
+            flex-grow: 1;
+        }
+        .text-section {
+            width: 50%;
+            padding-right: 30px;
+        }
+        .visual-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+        }
+        .info-list {
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            margin-bottom: 12px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .highlight-box {
+            background-color: #f0f6ff;
+            border-left: 4px solid #0366d6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .highlight-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0366d6;
+        }
+        .code-snippet {
+            background-color: #f6f8fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow: auto;
+            margin-top: 15px;
+        }
+        .function-diagram {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .function-box {
+            border: 2px solid #0366d6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: white;
+        }
+        .function-name {
+            font-weight: 700;
+            color: #0366d6;
+            margin-bottom: 8px;
+        }
+        .function-desc {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #555;
+            margin: 5px 0;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px 40px;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="slide-container">
+<div class="header">
+<h1 class="title">ai.js 핵심 함수와 설계 원리</h1>
+<p class="subtitle">오목 AI의 알고리즘 구현 상세 분석</p>
+</div>
+<div class="content">
+<div class="text-section">
+<div class="section-title">
+<i class="fas fa-code"></i>ai.js 파일의 주요 함수
+</div>
+<ul class="info-list">
+<li class="info-item"><strong>minimax(board, depth, alpha, beta, player, latestRow, latestCol)</strong> - 미니맥스 알고리즘과 알파-베타 가지치기의 핵심 구현</li>
+<li class="info-item"><strong>evaluateBoard(grid, latestRow, latestCol)</strong> - 현재 보드 상태의 점수 계산</li>
+<li class="info-item"><strong>isWinningMove(grid, who, row, col)</strong> - 승리 조건(5목) 판별</li>
+<li class="info-item"><strong>hasNeighbor(board, row, col)</strong> - 주변에 돌이 있는지 검사하여 탐색 공간 최적화</li>
+<li class="info-item"><strong>lineCheck(grid, who, sRow, sCol, mRow, mCol)</strong> - 특정 방향으로 연속된 돌 확인</li>
+</ul>
+<div class="highlight-box">
+<div class="highlight-title">AI의 핵심 설계 원리</div>
+<p>오목 AI는 다음과 같은 주요 설계 원칙을 따릅니다:</p>
+<ul class="info-list" style="margin-bottom: 0; padding-left: 15px;">
+<li class="info-item">깊이 제한된 미니맥스 탐색으로 계산 시간 제어</li>
+<li class="info-item">알파-베타 가지치기를 통한 탐색 최적화</li>
+<li class="info-item">인접 돌 중심 탐색으로 탐색 공간 축소</li>
+<li class="info-item">승리 조건과 점수 계산의 효율적 설계</li>
+</ul>
+</div>
+<div class="section-title">
+<i class="fas fa-cogs"></i>평가 함수의 특성
+</div>
+<ul class="info-list">
+<li class="info-item"><strong>evaluatePlayerBoard()</strong>: 각 플레이어 입장에서의 점수 계산</li>
+<li class="info-item">승리 조건(5목) 달성 시 최대 점수 1,000,000 반환</li>
+<li class="info-item">연결된 돌과 주변 돌 패턴에 기반한 점수 계산</li>
+<li class="info-item">컴퓨터(maximizer)와 사용자(minimizer) 점수 차이를 최종 평가 값으로 사용</li>
+</ul>
+</div>
+<div class="visual-section">
+<div class="function-diagram">
+<div class="function-box">
+<div class="function-name">minimax()</div>
+<div class="function-desc">• 재귀적으로 최적의 수 탐색</div>
+<div class="function-desc">• alpha, beta 값으로 불필요한 가지 제거</div>
+<div class="function-desc">• 최대 깊이에 도달하면 evaluateBoard 호출</div>
+</div>
+<div class="arrow">↓</div>
+<div class="function-box">
+<div class="function-name">evaluateBoard()</div>
+<div class="function-desc">• 현재 보드 상태 평가</div>
+<div class="function-desc">• AI(COMP)와 사람(HUMAN)의 점수 차이 계산</div>
+</div>
+<div class="arrow">↓</div>
+<div class="function-box">
+<div class="function-name">isWinningMove()</div>
+<div class="function-desc">• 특정 위치에 돌을 놓았을 때 승리 여부 판단</div>
+<div class="function-desc">• 가로, 세로, 대각선 4방향 검사</div>
+</div>
+<div class="arrow">↓</div>
+<div class="function-box">
+<div class="function-name">hasNeighbor()</div>
+<div class="function-desc">• 특정 위치 주변 8방향에 돌이 있는지 확인</div>
+<div class="function-desc">• 탐색 공간을 크게 줄이는 최적화 역할</div>
+</div>
+</div>
+<div class="code-snippet">
+function minimax(board, depth, alpha, beta, player, latestRow, latestCol) {
+  if (depth === 0) {
+    const val = evaluateBoard(board, latestRow, latestCol);
+    return [val, -1]; // [평가값, 최적 위치]
+  }
+
+  const opponent = player === COMP ? HUMAN : COMP;
+  
+  if (isWinningMove(board, opponent, latestRow, latestCol)) {
+    return player === COMP 
+      ? [1000000, -1]  // AI 승리 
+      : [-1000000, -1]; // 사람 승리
+  }
+  
+  // 최적 위치 탐색 및 알파-베타 가지치기 로직...
+}
+</div>
+</div>
+</div>
+<div class="footer">
+<div>게임 트리의 효율적 탐색과 현재 상태 평가가 인공지능의 핵심입니다.</div>
+<div><i class="fas fa-arrow-right"></i> 다음: 자바스크립트 코드 예시와 설명</div>
+</div>
+</div>
+</body>
+</html>
